@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @StateObject private var viewModel = BusinessIdeasViewModel()
     @State private var showingAddIdea = false
+    @AppStorage("isDarkMode") private var isDarkMode = false
     
     var body: some View {
         NavigationView {
@@ -46,6 +47,12 @@ struct ContentView: View {
             }
             .navigationTitle("Bizpark")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    NavigationLink(destination: SettingsView()) {
+                        Image(systemName: "gearshape.fill")
+                    }
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         showingAddIdea = true
@@ -59,5 +66,6 @@ struct ContentView: View {
                 AddIdeaView(viewModel: viewModel)
             }
         }
+        .preferredColorScheme(isDarkMode ? .dark : .light)
     }
 }
