@@ -3,6 +3,7 @@ import SwiftUI
 struct OnboardingView: View {
     @Binding var isOnboardingComplete: Bool
     @State private var currentPage = 0
+    @State private var isAnimating = false
     
     let pages = [
         OnboardingPage(
@@ -38,7 +39,15 @@ struct OnboardingView: View {
                         Image(systemName: pages[index].imageName)
                             .font(.system(size: 100))
                             .foregroundColor(pages[index].color)
-                            .symbolEffect(.bounce, options: .repeating)
+                            .scaleEffect(isAnimating ? 1.1 : 1.0)
+                            .animation(
+                                Animation.easeInOut(duration: 1.0)
+                                    .repeatForever(autoreverses: true),
+                                value: isAnimating
+                            )
+                            .onAppear {
+                                isAnimating = true
+                            }
                         
                         Text(pages[index].title)
                             .font(.title)
