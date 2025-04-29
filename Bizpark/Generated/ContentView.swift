@@ -4,6 +4,7 @@ struct ContentView: View {
     @StateObject private var viewModel = BusinessIdeasViewModel()
     @State private var showingAddIdea = false
     @AppStorage("isDarkMode") private var isDarkMode = false
+    @State private var isAnimating = false
     
     var body: some View {
         NavigationView {
@@ -21,7 +22,15 @@ struct ContentView: View {
                             Image(systemName: "lightbulb")
                                 .font(.system(size: 60))
                                 .foregroundColor(.yellow)
-                                .symbolEffect(.bounce)
+                                .scaleEffect(isAnimating ? 1.1 : 1.0)
+                                .animation(
+                                    Animation.easeInOut(duration: 1.0)
+                                        .repeatForever(autoreverses: true),
+                                    value: isAnimating
+                                )
+                                .onAppear {
+                                    isAnimating = true
+                                }
                             
                             Text("No Business Ideas Yet")
                                 .font(.title2)
