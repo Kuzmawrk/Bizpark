@@ -1,15 +1,78 @@
 {
-  "chatHistory" : [
-
-  ],
-  "bundleId" : "com.Bizpark.bznt9304",
   "id" : "6752F3FC-139C-4BB4-A593-A781C4EBFD29",
   "template" : "AppProject",
-  "lastModified" : 767609919.119366,
-  "teamId" : "com.Bizpark.bznt9304",
   "name" : "Bizpark",
+  "lastModified" : 767609919.119366,
+  "bundleId" : "com.Bizpark.bznt9304",
   "location" : "\/Users\/kuzmakuzmin\/Documents\/gen proj\/Bizpark",
+  "teamId" : "com.Bizpark.bznt9304",
+  "chatHistory" : [
+    {
+      "content" : "<usertask>Напиши приложение на SwiftUI, дизайн должен быть красивым и ярким. Вот описание: Bizpark — это легкое приложение, созданное для сбора бизнес-идей, как только они приходят вам в голову. Добавьте название и краткое описание, чтобы сохранить любую концепцию — будь то продукт, услуга или идея стартапа. Ваши идеи сохраняются в простом списке, который вы можете прокручивать или удалять в любое время.<\/usertask>",
+      "id" : "4CD7D572-ACAC-4676-8E98-9DDF0AF9964A",
+      "timestamp" : 767610044.665418,
+      "role" : "user"
+    },
+    {
+      "content" : "<write_to_file>\n<path>Models\/BusinessIdea.swift<\/path>\n<content>\n1|import Foundation\n2|\n3|struct BusinessIdea: Identifiable, Codable, Equatable {\n4|    let id: UUID\n5|    var title: String\n6|    var description: String\n7|    var createdAt: Date\n8|    \n9|    init(id: UUID = UUID(), title: String, description: String, createdAt: Date = Date()) {\n10|        self.id = id\n11|        self.title = title\n12|        self.description = description\n13|        self.createdAt = createdAt\n14|    }\n15|}\n<\/content>\n<\/write_to_file>\n\n<write_to_file>\n<path>ViewModels\/BusinessIdeasViewModel.swift<\/path>\n<content>\n1|import Foundation\n2|import SwiftUI\n3|\n4|class BusinessIdeasViewModel: ObservableObject {\n5|    @Published var ideas: [BusinessIdea] = []\n6|    private let saveKey = \"SavedBusinessIdeas\"\n7|    \n8|    init() {\n9|        loadIdeas()\n10|    }\n11|    \n12|    func addIdea(title: String, description: String) {\n13|        let idea = BusinessIdea(title: title, description: description)\n14|        ideas.insert(idea, at: 0)\n15|        saveIdeas()\n16|    }\n17|    \n18|    func deleteIdea(at offsets: IndexSet) {\n19|        ideas.remove(atOffsets: offsets)\n20|        saveIdeas()\n21|    }\n22|    \n23|    private func saveIdeas() {\n24|        if let encoded = try? JSONEncoder().encode(ideas) {\n25|            UserDefaults.standard.set(encoded, forKey: saveKey)\n26|        }\n27|    }\n28|    \n29|    private func loadIdeas() {\n30|        if let data = UserDefaults.standard.data(forKey: saveKey),\n31|           let decoded = try? JSONDecoder().decode([BusinessIdea].self, from: data) {\n32|            ideas = decoded\n33|        }\n34|    }\n35|}\n<\/content>\n<\/write_to_file>\n\n<write_to_file>\n<path>Views\/AddIdeaView.swift<\/path>\n<content>\n1|import SwiftUI\n2|\n3|struct AddIdeaView: View {\n4|    @Environment(\\.dismiss) private var dismiss\n5|    @ObservedObject var viewModel: BusinessIdeasViewModel\n6|    \n7|    @State private var title = \"\"\n8|    @State private var description = \"\"\n9|    @FocusState private var focusedField: Field?\n10|    \n11|    enum Field {\n12|        case title, description\n13|    }\n14|    \n15|    var body: some View {\n16|        NavigationView {\n17|            Form {\n18|                Section {\n19|                    TextField(\"Idea Title\", text: $title)\n20|                        .focused($focusedField, equals: .title)\n21|                        .font(.headline)\n22|                        .submitLabel(.next)\n23|                    \n24|                    TextEditor(text: $description)\n25|                        .focused($focusedField, equals: .description)\n26|                        .frame(height: 150)\n27|                        .font(.body)\n28|                }\n29|            }\n30|            .scrollDismissesKeyboard(.immediately)\n31|            .navigationTitle(\"New Business Idea\")\n32|            .navigationBarTitleDisplayMode(.inline)\n33|            .toolbar {\n34|                ToolbarItem(placement: .navigationBarLeading) {\n35|                    Button(\"Cancel\") {\n36|                        dismiss()\n37|                    }\n38|                }\n39|                \n40|                ToolbarItem(placement: .navigationBarTrailing) {\n41|                    Button(\"Save\") {\n42|                        saveIdea()\n43|                    }\n44|                    .disabled(title.isEmpty || description.isEmpty)\n45|                }\n46|                \n47|                ToolbarItemGroup(placement: .keyboard) {\n48|                    Spacer()\n49|                    Button(focusedField == .title ? \"Next\" : \"Done\") {\n50|                        if focusedField == .title {\n51|                            focusedField = .description\n52|                        } else {\n53|                            focusedField = nil\n54|                        }\n55|                    }\n56|                }\n57|            }\n58|        }\n59|    }\n60|    \n61|    private func saveIdea() {\n62|        viewModel.addIdea(title: title.trimmingCharacters(in: .whitespacesAndNewlines),\n63|                         description: description.trimmingCharacters(in: .whitespacesAndNewlines))\n64|        dismiss()\n65|    }\n66|}\n<\/content>\n<\/write_to_file>\n\n<write_to_file>\n<path>Views\/IdeaCardView.swift<\/path>\n<content>\n1|import SwiftUI\n2|\n3|struct IdeaCardView: View {\n4|    let idea: BusinessIdea\n5|    \n6|    var body: some View {\n7|        VStack(alignment: .leading, spacing: 12) {\n8|            Text(idea.title)\n9|                .font(.title2)\n10|                .fontWeight(.bold)\n11|                .foregroundColor(.primary)\n12|            \n13|            Text(idea.description)\n14|                .font(.body)\n15|                .foregroundColor(.secondary)\n16|                .lineLimit(3)\n17|            \n18|            HStack {\n19|                Image(systemName: \"clock\")\n20|                    .foregroundColor(.secondary)\n21|                Text(idea.createdAt.formatted(date: .abbreviated, time: .shortened))\n22|                    .font(.caption)\n23|                    .foregroundColor(.secondary)\n24|                Spacer()\n25|            }\n26|        }\n27|        .padding()\n28|        .background(\n29|            RoundedRectangle(cornerRadius: 16)\n30|                .fill(Color(.systemBackground))\n31|                .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)\n32|        )\n33|        .padding(.horizontal)\n34|        .padding(.vertical, 4)\n35|    }\n36|}\n<\/content>\n<\/write_to_file>\n\n<write_to_file>\n<path>Views\/ContentView.swift<\/path>\n<content>\n1|import SwiftUI\n2|\n3|struct ContentView: View {\n4|    @StateObject private var viewModel = BusinessIdeasViewModel()\n5|    @State private var showingAddIdea = false\n6|    \n7|    var body: some View {\n8|        NavigationView {\n9|            ZStack {\n10|                LinearGradient(\n11|                    gradient: Gradient(colors: [Color.blue.opacity(0.1), Color.purple.opacity(0.1)]),\n12|                    startPoint: .topLeading,\n13|                    endPoint: .bottomTrailing\n14|                )\n15|                .ignoresSafeArea()\n16|                \n17|                ScrollView {\n18|                    if viewModel.ideas.isEmpty {\n19|                        VStack(spacing: 20) {\n20|                            Image(systemName: \"lightbulb\")\n21|                                .font(.system(size: 60))\n22|                                .foregroundColor(.yellow)\n23|                            \n24|                            Text(\"No Business Ideas Yet\")\n25|                                .font(.title2)\n26|                                .fontWeight(.bold)\n27|                            \n28|                            Text(\"Tap the + button to add your first business idea!\")\n29|                                .foregroundColor(.secondary)\n30|                                .multilineTextAlignment(.center)\n31|                                .padding(.horizontal)\n32|                        }\n33|                        .frame(maxWidth: .infinity, maxHeight: .infinity)\n34|                        .padding(.top, 100)\n35|                    } else {\n36|                        LazyVStack(spacing: 0) {\n37|                            ForEach(viewModel.ideas) { idea in\n38|                                IdeaCardView(idea: idea)\n39|                                    .transition(.opacity)\n40|                            }\n41|                            .onDelete(perform: viewModel.deleteIdea)\n42|                        }\n43|                        .padding(.vertical)\n44|                    }\n45|                }\n46|            }\n47|            .navigationTitle(\"Bizpark\")\n48|            .toolbar {\n49|                ToolbarItem(placement: .navigationBarTrailing) {\n50|                    Button {\n51|                        showingAddIdea = true\n52|                    } label: {\n53|                        Image(systemName: \"plus.circle.fill\")\n54|                            .font(.title2)\n55|                    }\n56|                }\n57|            }\n58|            .sheet(isPresented: $showingAddIdea) {\n59|                AddIdeaView(viewModel: viewModel)\n60|            }\n61|        }\n62|    }\n63|}\n<\/content>\n<\/write_to_file>",
+      "id" : "FD18D3B5-974A-4D9B-93AA-B3D61386949E",
+      "timestamp" : 767610091.761589,
+      "fileChanges" : [
+        {
+          "type" : "modified",
+          "changes" : {
+            "removedLines" : 0,
+            "addedLines" : 50
+          },
+          "path" : "ContentView.swift",
+          "id" : "34202C69-39A3-42C4-B3CA-45647694492D"
+        },
+        {
+          "type" : "added",
+          "changes" : {
+            "removedLines" : 0,
+            "addedLines" : 36
+          },
+          "path" : "IdeaCardView.swift",
+          "id" : "D8C76E8A-D105-414C-AA9C-A37C6CACE602"
+        },
+        {
+          "type" : "added",
+          "changes" : {
+            "addedLines" : 15,
+            "removedLines" : 0
+          },
+          "path" : "BusinessIdea.swift",
+          "id" : "4B9126E9-5D0D-4CEF-96F6-4A378AAF6F4F"
+        },
+        {
+          "type" : "added",
+          "changes" : {
+            "addedLines" : 66,
+            "removedLines" : 0
+          },
+          "path" : "AddIdeaView.swift",
+          "id" : "5AB469DC-F39B-4901-9C98-27C8EBD58F94"
+        },
+        {
+          "type" : "added",
+          "changes" : {
+            "addedLines" : 35,
+            "removedLines" : 0
+          },
+          "path" : "BusinessIdeasViewModel.swift",
+          "id" : "ED5F7A19-21B6-408D-B82B-291FADA99400"
+        }
+      ],
+      "model" : "anthropic\/claude-3.5-sonnet",
+      "role" : "assistant"
+    }
+  ],
   "files" : [
-
+    "\/Users\/kuzmakuzmin\/Documents\/gen proj\/Bizpark\/Bizpark\/Generated\/ViewModels\/BusinessIdeasViewModel.swift",
+    "\/Users\/kuzmakuzmin\/Documents\/gen proj\/Bizpark\/Bizpark\/Generated\/Views\/IdeaCardView.swift",
+    "\/Users\/kuzmakuzmin\/Documents\/gen proj\/Bizpark\/Bizpark\/Generated\/Views\/AddIdeaView.swift",
+    "\/Users\/kuzmakuzmin\/Documents\/gen proj\/Bizpark\/Bizpark\/Generated\/Models\/BusinessIdea.swift",
+    "\/Users\/kuzmakuzmin\/Documents\/gen proj\/Bizpark\/Bizpark\/Generated\/ContentView.swift"
   ]
 }
