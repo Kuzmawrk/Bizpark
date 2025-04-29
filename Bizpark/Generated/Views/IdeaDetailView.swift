@@ -2,6 +2,7 @@ import SwiftUI
 
 struct IdeaDetailView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     @ObservedObject var viewModel: BusinessIdeasViewModel
     let idea: BusinessIdea
     
@@ -18,31 +19,41 @@ struct IdeaDetailView: View {
                     
                     Text(idea.createdAt.formatted(date: .long, time: .shortened))
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(colorScheme == .dark ? .white.opacity(0.6) : .secondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
                 .background(
                     RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.accentColor.opacity(0.1))
+                        .fill(colorScheme == .dark ? Color(UIColor.systemGray6) : Color.accentColor.opacity(0.1))
                 )
                 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Description")
                         .font(.headline)
+                        .foregroundColor(colorScheme == .dark ? .white : .primary)
                     
                     Text(idea.description)
                         .lineSpacing(4)
+                        .foregroundColor(colorScheme == .dark ? .white.opacity(0.8) : .primary)
                 }
                 
                 if let budget = idea.budget {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Estimated Budget")
                             .font(.headline)
+                            .foregroundColor(colorScheme == .dark ? .white : .primary)
                         
                         Text(String(format: "$%.2f", budget))
                             .font(.title2)
+                            .fontWeight(.semibold)
                             .foregroundColor(.green)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(colorScheme == .dark ? Color.green.opacity(0.2) : Color.green.opacity(0.1))
+                            )
                     }
                 }
                 

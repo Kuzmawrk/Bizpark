@@ -2,6 +2,7 @@ import SwiftUI
 
 struct EditIdeaView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     @ObservedObject var viewModel: BusinessIdeasViewModel
     let idea: BusinessIdea
     
@@ -23,12 +24,24 @@ struct EditIdeaView: View {
                 Section {
                     TextField("Title", text: $title)
                         .font(.headline)
+                        .textFieldStyle(CustomTextFieldStyle())
                     
                     TextEditor(text: $description)
                         .frame(height: 150)
+                        .font(.body)
+                        .padding(8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(colorScheme == .dark ? Color(UIColor.systemGray6) : Color(.systemBackground))
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                        )
                     
                     TextField("Budget (Optional)", text: $budget)
                         .keyboardType(.decimalPad)
+                        .textFieldStyle(CustomTextFieldStyle())
                 }
             }
             .navigationTitle("Edit Idea")
