@@ -7,30 +7,20 @@ struct AddIdeaView: View {
     @State private var title = ""
     @State private var description = ""
     @State private var budget = ""
-    @FocusState private var focusedField: Field?
-    
-    enum Field {
-        case title, description, budget
-    }
     
     var body: some View {
         NavigationView {
             Form {
                 Section {
                     TextField("Idea Title", text: $title)
-                        .focused($focusedField, equals: .title)
                         .font(.headline)
-                        .submitLabel(.next)
                     
                     TextEditor(text: $description)
-                        .focused($focusedField, equals: .description)
                         .frame(height: 150)
                         .font(.body)
                     
                     TextField("Estimated Budget (Optional)", text: $budget)
-                        .focused($focusedField, equals: .budget)
                         .keyboardType(.decimalPad)
-                        .submitLabel(.done)
                 }
             }
             .scrollDismissesKeyboard(.immediately)
@@ -49,40 +39,7 @@ struct AddIdeaView: View {
                     }
                     .disabled(title.isEmpty || description.isEmpty)
                 }
-                
-                ToolbarItemGroup(placement: .keyboard) {
-                    Spacer()
-                    Button(nextButtonTitle) {
-                        handleNextButton()
-                    }
-                }
             }
-        }
-    }
-    
-    private var nextButtonTitle: String {
-        switch focusedField {
-        case .title:
-            return "Next"
-        case .description:
-            return "Next"
-        case .budget:
-            return "Done"
-        case .none:
-            return "Done"
-        }
-    }
-    
-    private func handleNextButton() {
-        switch focusedField {
-        case .title:
-            focusedField = .description
-        case .description:
-            focusedField = .budget
-        case .budget:
-            focusedField = nil
-        case .none:
-            break
         }
     }
     

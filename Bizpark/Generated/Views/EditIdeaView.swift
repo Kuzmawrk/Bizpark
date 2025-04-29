@@ -8,11 +8,6 @@ struct EditIdeaView: View {
     @State private var title: String
     @State private var description: String
     @State private var budget: String
-    @FocusState private var focusedField: Field?
-    
-    enum Field {
-        case title, description, budget
-    }
     
     init(viewModel: BusinessIdeasViewModel, idea: BusinessIdea) {
         self.viewModel = viewModel
@@ -27,18 +22,13 @@ struct EditIdeaView: View {
             Form {
                 Section {
                     TextField("Title", text: $title)
-                        .focused($focusedField, equals: .title)
                         .font(.headline)
-                        .submitLabel(.next)
                     
                     TextEditor(text: $description)
-                        .focused($focusedField, equals: .description)
                         .frame(height: 150)
                     
                     TextField("Budget (Optional)", text: $budget)
-                        .focused($focusedField, equals: .budget)
                         .keyboardType(.decimalPad)
-                        .submitLabel(.done)
                 }
             }
             .navigationTitle("Edit Idea")
@@ -55,20 +45,6 @@ struct EditIdeaView: View {
                         saveIdea()
                     }
                     .disabled(title.isEmpty || description.isEmpty)
-                }
-                
-                ToolbarItemGroup(placement: .keyboard) {
-                    Spacer()
-                    Button(focusedField == .budget ? "Done" : "Next") {
-                        switch focusedField {
-                        case .title:
-                            focusedField = .description
-                        case .description:
-                            focusedField = .budget
-                        default:
-                            focusedField = nil
-                        }
-                    }
                 }
             }
         }
