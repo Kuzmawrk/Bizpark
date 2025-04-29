@@ -21,6 +21,7 @@ struct ContentView: View {
                             Image(systemName: "lightbulb")
                                 .font(.system(size: 60))
                                 .foregroundColor(.yellow)
+                                .symbolEffect(.bounce)
                             
                             Text("No Business Ideas Yet")
                                 .font(.title2)
@@ -36,13 +37,31 @@ struct ContentView: View {
                     } else {
                         LazyVStack(spacing: 0) {
                             ForEach(viewModel.ideas) { idea in
-                                IdeaCardView(idea: idea)
-                                    .transition(.opacity)
+                                NavigationLink(destination: IdeaDetailView(viewModel: viewModel, idea: idea)) {
+                                    IdeaCardView(idea: idea)
+                                }
                             }
-                            .onDelete(perform: viewModel.deleteIdea)
                         }
                         .padding(.vertical)
                     }
+                }
+                
+                if viewModel.showSuccessNotification {
+                    VStack {
+                        Spacer()
+                        HStack {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                            Text("Idea successfully added!")
+                                .foregroundColor(.white)
+                        }
+                        .padding()
+                        .background(Color.black.opacity(0.8))
+                        .cornerRadius(25)
+                        .padding(.bottom, 20)
+                    }
+                    .transition(.move(edge: .bottom))
+                    .animation(.spring(), value: viewModel.showSuccessNotification)
                 }
             }
             .navigationTitle("Bizpark")

@@ -1,23 +1,32 @@
 import SwiftUI
 
-struct AddIdeaView: View {
+struct EditIdeaView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var viewModel: BusinessIdeasViewModel
+    let idea: BusinessIdea
     
-    @State private var title = ""
-    @State private var description = ""
-    @State private var budget = ""
+    @State private var title: String
+    @State private var description: String
+    @State private var budget: String
     @FocusState private var focusedField: Field?
     
     enum Field {
         case title, description, budget
     }
     
+    init(viewModel: BusinessIdeasViewModel, idea: BusinessIdea) {
+        self.viewModel = viewModel
+        self.idea = idea
+        _title = State(initialValue: idea.title)
+        _description = State(initialValue: idea.description)
+        _budget = State(initialValue: idea.budget.map { String(format: "%.2f", $0) } ?? "")
+    }
+    
     var body: some View {
         NavigationView {
             Form {
                 Section {
-                    TextField("Idea Title", text: $title)
+                    TextField("Title", text: $title)
                         .focused($focusedField, equals: .title)
                         .font(.headline)
                         .submitLabel(.next)
@@ -25,16 +34,14 @@ struct AddIdeaView: View {
                     TextEditor(text: $description)
                         .focused($focusedField, equals: .description)
                         .frame(height: 150)
-                        .font(.body)
                     
-                    TextField("Estimated Budget (Optional)", text: $budget)
+                    TextField("Budget (Optional)", text: $budget)
                         .focused($focusedField, equals: .budget)
                         .keyboardType(.decimalPad)
                         .submitLabel(.done)
                 }
             }
-            .scrollDismissesKeyboard(.immediately)
-            .navigationTitle("New Business Idea")
+            .navigationTitle("Edit Idea")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -52,43 +59,25 @@ struct AddIdeaView: View {
                 
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
-                    Button(nextButtonTitle) {
-                        handleNextButton()
+                    Button(focusedField == .budget ? "Done" : "Next") {
+                        switch focusedField {
+                        case .title:
+                            focusedField = .description
+                        case .description:
+                            focusedField = .budget
+                        default:
+                            focusedField = nil
+                        }
                     }
                 }
             }
         }
     }
     
-    private var nextButtonTitle: String {
-        switch focusedField {
-        case .title:
-            return "Next"
-        case .description:
-            return "Next"
-        case .budget:
-            return "Done"
-        case .none:
-            return "Done"
-        }
-    }
-    
-    private func handleNextButton() {
-        switch focusedField {
-        case .title:
-            focusedField = .description
-        case .description:
-            focusedField = .budget
-        case .budget:
-            focusedField = nil
-        case .none:
-            break
-        }
-    }
-    
     private func saveIdea() {
         let budgetValue = Double(budget.replacingOccurrences(of: ",", with: "."))
-        viewModel.addIdea(
+        viewModel.updateIdea(
+            id: idea.id,
             title: title.trimmingCharacters(in: .whitespacesAndNewlines),
             description: description.trimmingCharacters(in: .whitespacesAndNewlines),
             budget: budgetValue

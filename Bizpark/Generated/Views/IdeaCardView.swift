@@ -21,7 +21,15 @@ struct IdeaCardView: View {
                 Text(idea.createdAt.formatted(date: .abbreviated, time: .shortened))
                     .font(.caption)
                     .foregroundColor(.secondary)
+                
                 Spacer()
+                
+                if let budget = idea.budget {
+                    Text(String(format: "$%.2f", budget))
+                        .font(.callout)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.green)
+                }
             }
         }
         .padding()
