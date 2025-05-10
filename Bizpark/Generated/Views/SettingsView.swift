@@ -14,7 +14,7 @@ struct SettingsView: View {
                 Toggle(isOn: $isDarkMode) {
                     Label("Dark Mode", systemImage: "moon.fill")
                 }
-                .tint(Color.accentColor)
+                .tint(Color.purple)
             }
             
             Section {
