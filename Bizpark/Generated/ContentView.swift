@@ -18,12 +18,18 @@
                               Label("Notes", systemImage: "note.text")
                           }
                       
+                      StatisticsView(viewModel: viewModel)
+                          .tabItem {
+                              Label("Statistics", systemImage: "chart.bar.fill")
+                          }
+                      
                       SettingsView()
                           .tabItem {
                               Label("Settings", systemImage: "gearshape.fill")
                           }
                   }
                   .preferredColorScheme(isDarkMode ? .dark : .light)
+                  .tint(Color.primary)
               }
           }
       }
